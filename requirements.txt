@@ -1,0 +1,9 @@
+
+scikit-learn
+pandas
+fastapi
+uvicorn
+joblib
+statsmodels
+lightgbm
+category-encoders
