@@ -7,3 +7,4 @@ joblib
 statsmodels
 lightgbm
 category-encoders
+streamlit

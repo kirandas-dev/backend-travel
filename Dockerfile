@@ -7,3 +7,5 @@ COPY ./app /app
 
 COPY ./Models /Models
 CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-c", "/gunicorn_conf.py", "main:app"]
+
+
