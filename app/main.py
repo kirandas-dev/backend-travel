@@ -132,6 +132,70 @@ def predict_airfare(startingAirport: str, destinationAirport: str, FlightDay:int
     Predicted_fare_XGBModel3 =  xgb_model.predict(User_Request_XGBmodel3)
     lowest_airfare_float = float(Predicted_fare_XGBModel3[0])
     return JSONResponse(content={ "Predicted Airfare": round(lowest_airfare_float, 2)})
+
+@app.get("/Saumya_shop_predict_airfare")
+def predict_airfare(
+    startingAirport: str,
+    destinationAirport: str,
+    departure_year: int,
+    departure_month: int,
+    departure_day: int,
+    departure_hour: int,
+    departure_minute: int,
+    cabin_code: str):
+    # Create a DataFrame with the calculated values
+    data = {
+        'startingAirport': [startingAirport],
+        'destinationAirport': [destinationAirport],
+        'departure_year': [departure_year],
+        'departure_month': [departure_month],
+        'departure_day': [departure_day],
+        'departure_hour': [departure_hour],
+        'departure_minute': [departure_minute],
+        'cabin_code': [cabin_code]
+    }
+    # Load the lgbm model and label encoder
+    loaded_data_segment = load('../models/predictive/Saumya_Encoders_and_Model.joblib')
+    label_encoder = loaded_data_segment['label_encoder']
+    lgb_model = loaded_data_segment['lgb_model']
+    X_val = pd.DataFrame(data)
+
+    airport_mapping = {
+        'ATL': 904571,
+        'BOS': 989175,
+        'CLT': 888283,
+        'DEN': 787482,
+        'DFW': 929732,
+        'DTW': 747751,
+        'EWR': 713693,
+        'IAD': 594215,
+        'JFK': 692376,
+        'LAX': 1352275,
+        'LGA': 1032726,
+        'MIA': 928766,
+        'OAK': 527105,
+        'ORD': 917732,
+        'PHL': 785039,
+        'SFO': 949046
+    }
+
+    # Apply airport_mapping to 'startingAirport' and 'destinationAirport'
+    X_val['startingAirport'] = X_val['startingAirport'].replace(airport_mapping)
+    X_val['destinationAirport'] = X_val['destinationAirport'].replace(airport_mapping)
+
+    # Encoding 'cabin_code' using label_encoder
+    X_val['cabin_code'] = label_encoder.transform(X_val['cabin_code'])
+
+    # Implement your airfare prediction logic here
+    # Use the loaded lgb_model to predict airfare
+    pred = lgb_model.predict(X_val)
+
+    lowest_airfare_float = float(pred[0])
+
+    # Create a JSON response with the prediction
+    
+    return JSONResponse(content={ "Predicted Airfare": round(lowest_airfare_float, 2)})
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
