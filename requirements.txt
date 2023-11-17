@@ -8,3 +8,4 @@ statsmodels
 lightgbm
 category-encoders
 streamlit
+xgboost
