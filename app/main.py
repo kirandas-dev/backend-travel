@@ -18,7 +18,7 @@ def healthcheck():
     return 'Hello there. Welcome! Get some useful insights using our predictives analytics on the American Airlines!'
 
 
-@app.get("/predict_airfare_best_segment")
+@app.get("/kiran_shop_predict_airfare_best_segment")
 def predict_airfare(startingAirport: str, destinationAirport: str, DayOfWeek: int, Month: int, Year: int, DepartureHour: int, DepartureMinute: int, CabinCode: str):
 
     lowest_airfare = float('inf')  # Initialize with positive infinity
@@ -103,7 +103,35 @@ def predict_airfare(startingAirport: str, destinationAirport: str, DayOfWeek: in
     # Return the predicted airfare of the best segment as a JSON response
     return JSONResponse(content={"Best Segment": best_segment, "Predicted Airfare": round(lowest_airfare_float, 2)})
 
+@app.get("/steff_shop_predict_airfare")
+def predict_airfare(startingAirport: str, destinationAirport: str, FlightDay:int, FlightMonth:int, FlightYear:int, DepartureHour:int, DepartureMinute:int, DepartureSecond:int, isBasicEconomy:int, isRefundable:int, isNonStop:int, Days_Until_Flight:int, segmentsCabinCode:str):
+    model_filename_segment = f"/Models/Steffi_Travel_Shop/Steffi_XGBoost_model.joblib"
+    loaded_data_segment = load(model_filename_segment)
+    Lab_enc = loaded_data_segment['label_encoder']
+    xgb_model = loaded_data_segment['xgb_model']
+    
+    User_Request_XGBmodel3 = pd.DataFrame({
+        'startingAirport': [startingAirport],
+        'destinationAirport': [destinationAirport],
+        'FlightDay': [FlightDay],
+        'FlightMonth': [FlightMonth],
+        'FlightYear': [FlightYear],
+        'DepartureHour': [DepartureHour],
+        'DepartureMinute': [DepartureMinute],
+        'DepartureSecond': [DepartureSecond],
+        'isBasicEconomy' : [isBasicEconomy], 
+        'isRefundable':[isRefundable], 
+        'isNonStop':[isNonStop], 
+        'Days_Until_Flight':[Days_Until_Flight],
+        'segmentsCabinCode': [segmentsCabinCode]
+    })
 
+    User_Request_XGBmodel3['startingAirport']=Lab_enc.fit_transform(User_Request_XGBmodel3['startingAirport'])
+    User_Request_XGBmodel3['destinationAirport']=Lab_enc.fit_transform(User_Request_XGBmodel3['destinationAirport'])
+    User_Request_XGBmodel3['segmentsCabinCode']=Lab_enc.fit_transform(User_Request_XGBmodel3['segmentsCabinCode'])
+    Predicted_fare_XGBModel3 =  xgb_model.predict(User_Request_XGBmodel3)
+    lowest_airfare_float = float(Predicted_fare_XGBModel3[0])
+    return JSONResponse(content={ "Predicted Airfare": round(lowest_airfare_float, 2)})
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
