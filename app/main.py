@@ -155,9 +155,9 @@ def predict_airfare(
         'cabin_code': [cabin_code]
     }
     # Load the lgbm model and label encoder
-    loaded_data_segment = load('../models/predictive/Saumya_Encoders_and_Model.joblib')
-    label_encoder = loaded_data_segment['label_encoder']
-    lgb_model = loaded_data_segment['lgb_model']
+    label_encoder = load('/Models/Saumya_Travel_Shop/label_encoder.joblib')
+ 
+    lgb_model = load('/Models/Saumya_Travel_Shop/model_lgb.joblib')
     X_val = pd.DataFrame(data)
 
     airport_mapping = {
