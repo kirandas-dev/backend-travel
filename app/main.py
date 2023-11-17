@@ -9,7 +9,7 @@ app = FastAPI()
 @app.get("/")
 def read_root():
     return {
-        "Project Objectives": "This project deploys two different models as APIs:"
+        "Project Objectives": "This project deploys three different travel apps as APIs:"
         
     }
 
